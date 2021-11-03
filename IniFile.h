@@ -140,43 +140,46 @@ std::string IniFile::read(std::string section,
 }
 
 template<>
-int IniFile::read(const std::string section,
-	const std::string key,
-	int defaultValue) const
+int IniFile::read(std::string section, 
+				std::string key, 
+				int defaultValue) const 
 {
-	if (!keyExists(section, key)) {
+	try {
+		return std::stoi(_data.at(section).at(key));
+	}
+	catch (std::exception err) {
 		return defaultValue;
 	}
-
-	return std::stoi(_data.at(section).at(key));
 }
 
 template<>
-float IniFile::read(const std::string section,
-	const std::string key,
-	float defaultValue) const 
+float IniFile::read(std::string section, 
+					std::string key, 
+					float defaultValue) const 
 {
-	if (!keyExists(section, key)) {
+	try {
+		return std::stof(_data.at(section).at(key));
+	}
+	catch (std::exception err) {
 		return defaultValue;
 	}
-
-	return std::stof(_data.at(section).at(key));
 }
 
 template<>
-bool IniFile::read(const std::string section,
-	const std::string key,
-	bool defaultValue) const
+bool IniFile::read(std::string section, 
+				std::string key, 
+				bool defaultValue) const 
 {
-	if (!keyExists(section, key)) {
+	try {
+		std::string keyLowerCase = _data.at(section).at(key);
+		std::transform(keyLowerCase.begin(), keyLowerCase.end(),
+			keyLowerCase.begin(), [](unsigned char c) { return std::tolower(c); });
+		auto i = std::find(_boolValues.begin(), _boolValues.end(), keyLowerCase);
+		return i != _boolValues.end();
+	}
+	catch (std::exception err) {
 		return defaultValue;
 	}
-	std::string keyLowerCase = _data.at(section).at(key);
-	std::transform(keyLowerCase.begin(), keyLowerCase.end(),
-		keyLowerCase.begin(), [](unsigned char c) { return std::tolower(c); });
-	auto i = std::find(_boolValues.begin(), _boolValues.end(), keyLowerCase);
-
-	return i != _boolValues.end();
 }
 
 template<>
